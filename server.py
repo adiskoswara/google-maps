@@ -19,7 +19,10 @@ from ai_pitch import generate_ai_pitch
 
 init_db()
 
-app = FastAPI(title="Google Maps F&B Intelligence & WhatsApp Lead Finder")
+app = FastAPI(
+    title="Google Maps F&B Intelligence & WhatsApp Lead Finder",
+    redirect_slashes=False
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -53,16 +56,32 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 
 @app.get("/", response_class=HTMLResponse)
+@app.get("/api", response_class=HTMLResponse)
+@app.get("/api/", response_class=HTMLResponse)
+@app.get("/api/index", response_class=HTMLResponse)
+@app.get("/api/index.py", response_class=HTMLResponse)
 async def serve_index():
     index_file = os.path.join(STATIC_DIR, "index.html")
     with open(index_file, "r", encoding="utf-8") as f:
         return f.read()
 
 @app.get("/demo", response_class=HTMLResponse)
+@app.get("/api/demo", response_class=HTMLResponse)
 async def serve_demo():
     demo_file = os.path.join(STATIC_DIR, "demo.html")
     with open(demo_file, "r", encoding="utf-8") as f:
         return f.read()
+
+@app.exception_handler(404)
+async def custom_404_handler(request: Request, exc):
+    path = request.url.path
+    # If the user is requesting root or page route on Vercel, fallback to index.html
+    if not path.startswith("/static/"):
+        index_file = os.path.join(STATIC_DIR, "index.html")
+        if os.path.exists(index_file):
+            with open(index_file, "r", encoding="utf-8") as f:
+                return HTMLResponse(content=f.read())
+    return JSONResponse(status_code=404, content={"detail": f"Route {path} not found"})
 
 @app.get("/api/stream")
 async def sse_stream(request: Request):
@@ -150,6 +169,7 @@ async def stop_scan():
     return {"status": "not_running"}
 
 @app.get("/api/leads")
+@app.get("/leads")
 async def fetch_leads(
     filter_no_website: bool = Query(False),
     only_with_whatsapp: bool = Query(False),
@@ -163,15 +183,18 @@ async def fetch_leads(
     return {"leads": leads, "count": len(leads)}
 
 @app.get("/api/stats")
+@app.get("/stats")
 async def fetch_stats():
     return get_stats()
 
 @app.delete("/api/leads/{lead_id}")
+@app.delete("/leads/{lead_id}")
 async def remove_lead(lead_id: int):
     delete_lead(lead_id)
     return {"status": "deleted", "id": lead_id}
 
 @app.post("/api/leads/clear")
+@app.post("/leads/clear")
 async def clear_leads():
     clear_all_leads()
     return {"status": "cleared"}
@@ -184,6 +207,7 @@ class AIPitchRequest(BaseModel):
     sender_name: Optional[str] = ""
 
 @app.post("/api/ai/pitch")
+@app.post("/ai/pitch")
 async def generate_pitch_endpoint(req: AIPitchRequest):
     pitch = generate_ai_pitch(
         req.lead, 
