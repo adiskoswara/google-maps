@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Demo Website &amp; Digital Menu</title>
+  <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --bg: #090c15;
+      --surface: rgba(18, 24, 38, 0.7);
+      --surface-card: #111726;
+      --border: rgba(255, 255, 255, 0.08);
+      --primary: #6366f1;
+      --cyan: #06b6d4;
+      --amber: #f59e0b;
+      --emerald: #10b981;
+      --wa-green: #25d366;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --radius: 16px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* Agency Demo Bar */
+    .agency-banner {
+      background: linear-gradient(90deg, #4f46e5, #06b6d4);
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(79, 70, 229, 0.4);
+    }
+
+    .banner-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .btn-claim {
+      background: #fff;
+      color: #1e1b4b;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.2s;
+    }
+
+    .btn-claim:hover { transform: scale(1.05); }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      padding: 80px 24px 60px;
+      text-align: center;
+      background: radial-gradient(circle at 50% 20%, rgba(99, 102, 241, 0.2) 0%, transparent 60%);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      background: linear-gradient(90deg, #fff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      max-width: 600px;
+      margin: 0 auto 28px;
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(34, 197, 94, 0.5);
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 60px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px;
+      border-radius: var(--radius);
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .feature-card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    /* Menu Catalog Section */
+    .section-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .section-sub {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .menu-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .menu-tab {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .menu-tab.active, .menu-tab:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 50px;
+    }
+
+    .menu-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+
+    .menu-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: #1e293b;
+    }
+
+    .menu-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .menu-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .menu-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .menu-price {
+      font-family: 'Outfit', sans-serif;
+      color: #38bdf8;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .menu-desc {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      flex: 1;
+    }
+
+    .btn-add-order {
+      background: rgba(34, 197, 94, 0.12);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      padding: 9px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+      width: 100%;
+    }
+
+    .btn-add-order:hover {
+      background: var(--wa-green);
+      color: #fff;
+    }
+
+    /* Location & Contact Card */
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      backdrop-filter: blur(16px);
+    }
+
+    .info-item {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .info-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .info-text h4 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .info-text p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Floating WhatsApp Button */
+    .floating-wa {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--wa-green);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 8px 30px rgba(37, 211, 102, 0.4);
+      z-index: 90;
+      transition: transform 0.2s;
+    }
+
+    .floating-wa:hover {
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 900px) {
+      .features-grid, .menu-grid, .info-card { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Banner for Prospect Outreach -->
+  <aside class="agency-banner">
+    <div class="banner-text">
+      <i data-lucide="sparkles"></i>
+      <span>Preview Demo Website Khusus untuk <strong id="bannerBizName">Nama Kafe</strong></span>
+    </div>
+    <a href="#" id="bannerWaBtn" class="btn-claim" target="_blank">Hubungi Pengembang Website</a>
+  </aside>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-badge">
+      <i data-lucide="map-pin"></i>
+      <span id="heroLocationBadge">Surabaya, Indonesia</span>
+    </div>
+    <h1 id="heroTitle">Selamat Datang di Kafe Kami</h1>
+    <p id="heroSubtitle">Nikmati sajian kuliner istimewa, kopi pilihan terbaik, dan suasana hangat yang nyaman untuk berkumpul bersama teman dan keluarga.</p>
+    
+    <div class="hero-actions">
+      <a href="#menu" class="btn btn-primary" id="btnOrderDirect">
+        <i data-lucide="shopping-bag"></i> Pesan via WhatsApp
+      </a>
+      <a href="#lokasi" class="btn btn-outline">
+        <i data-lucide="navigation"></i> Petunjuk Arah &amp; Jam Buka
+      </a>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Value Props -->
+    <section class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i data-lucide="coffee"></i></div>
+        <h3>Bahan Kualitas Terbaik</h3>
+        <p>Setiap menu disajikan segar dengan standar bahan baku premium pilihan.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i data-lucide="wifi"></i></div>
+        <h3>Tempat Nyaman &amp; Wi-Fi</h3>
+        <p>Cocok untuk santai, bekerja (WFC), maupun reuni santai bersama keluarga.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i data-lucide="message-circle"></i></div>
+        <h3>Pemesanan Cepat via WhatsApp</h3>
+        <p>Pesan langsung ke meja atau delivery tanpa ribet dan tanpa potongan aplikasi.</p>
+      </div>
+    </section>
+
+    <!-- Menu Catalog Section -->
+    <section id="menu">
+      <div class="section-header">
+        <h2 class="section-title">Daftar Menu Favorit</h2>
+        <p class="section-sub">Klik menu untuk langsung pesan melalui WhatsApp resmi kami</p>
+      </div>
+
+      <div class="menu-tabs">
+        <button class="menu-tab active" onclick="filterMenu('all')">Semua Menu</button>
+        <button class="menu-tab" onclick="filterMenu('kopi')">☕ Kopi &amp; Minuman</button>
+        <button class="menu-tab" onclick="filterMenu('makanan')">🍝 Makanan Utama</button>
+        <button class="menu-tab" onclick="filterMenu('snack')">🥐 Snack &amp; Dessert</button>
+      </div>
+
+      <div class="menu-grid" id="menuGrid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- Location & Contact -->
+    <section id="lokasi" style="margin-top: 50px;">
+      <div class="section-header">
+        <h2 class="section-title">Lokasi &amp; Jam Operasional</h2>
+        <p class="section-sub">Kunjungi kami langsung atau hubungi untuk reservasi tempat</p>
+      </div>
+
+      <div class="info-card">
+        <div>
+          <div class="info-item">
+            <div class="info-icon"><i data-lucide="map-pin"></i></div>
+            <div class="info-text">
+              <h4>Alamat Lengkap</h4>
+              <p id="infoAddress">Jl. Contoh Alamat No. 123, Pusat Kota</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon"><i data-lucide="clock"></i></div>
+            <div class="info-text">
+              <h4>Jam Buka</h4>
+              <p>Setiap Hari: 08.00 - 23.00 WIB</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon"><i data-lucide="phone"></i></div>
+            <div class="info-text">
+              <h4>Kontak WhatsApp</h4>
+              <p id="infoPhone">+62 812-3456-7890</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; justify-content: center; gap: 16px;">
+          <h3 style="font-family: 'Outfit'; font-size: 1.25rem;">Reservasi &amp; Info Pesanan</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Ingin mengadakan acara khusus atau memesan meja terlebih dahulu? Hubungi kami langsung melalui WhatsApp untuk respon cepat.
+          </p>
+          <a href="#" id="btnBottomWa" class="btn btn-primary" style="align-self: flex-start;" target="_blank">
+            <i data-lucide="message-circle"></i> Chat WhatsApp Sekarang
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Floating WhatsApp CTA -->
+  <a href="#" id="floatingWaBtn" class="floating-wa" target="_blank">
+    <i data-lucide="message-circle"></i>
+    <span>Pesan via WA</span>
+  </a>
+
+  <script>
+    // URL Params parsing: ?name=...&category=...&city=...&phone=...&address=...
+    const urlParams = new URLSearchParams(window.location.search);
+    const bizName = urlParams.get('name') || "Kafe & Resto Modern";
+    const bizCat = urlParams.get('category') || "Kuliner & Kopi";
+    const bizCity = urlParams.get('city') || "Indonesia";
+    const bizPhone = urlParams.get('phone') || "6281234567890";
+    const bizAddress = urlParams.get('address') || "Alamat resmi terdaftar di Google Maps";
+
+    // Populate Dynamic Content
+    document.getElementById('pageTitle').textContent = `${bizName} - Website Resmi & Menu`;
+    document.getElementById('bannerBizName').textContent = bizName;
+    document.getElementById('heroTitle').textContent = bizName;
+    document.getElementById('heroSubtitle').textContent = `Selamat datang di ${bizName}. Pilihan terbaik untuk menikmati ${bizCat.toLowerCase()} berkualitas tinggi di kota ${bizCity}.`;
+    document.getElementById('heroLocationBadge').textContent = `${bizCity} • ${bizCat}`;
+    document.getElementById('infoAddress').textContent = bizAddress;
+    document.getElementById('infoPhone').textContent = bizPhone.startsWith('62') ? `+${bizPhone}` : bizPhone;
+
+    // WhatsApp Links
+    const waText = encodeURIComponent(`Halo ${bizName}, saya ingin pesan menu / reservasi dari website.`);
+    const waUrl = `https://wa.me/${bizPhone}?text=${waText}`;
+    
+    document.getElementById('btnOrderDirect').href = waUrl;
+    document.getElementById('btnBottomWa').href = waUrl;
+    document.getElementById('floatingWaBtn').href = waUrl;
+    document.getElementById('bannerWaBtn').href = `https://wa.me/${bizPhone}?text=${encodeURIComponent('Halo, saya melihat preview demo website untuk ' + bizName + ' ini.')}`;
+
+    // Sample Curated Menu Items with Real Aesthetic Unsplash Food Images
+    const MENU_ITEMS = [
+      {
+        id: 1,
+        cat: 'kopi',
+        name: 'Signature Aren Latte',
+        price: 'Rp 28.000',
+        desc: 'Espresso blend pilihan dengan gula aren organik dan susu segar gurih.',
+        img: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        id: 2,
+        cat: 'kopi',
+        name: 'Creamy Vanilla Cold Brew',
+        price: 'Rp 32.000',
+        desc: 'Kopi seduh dingin 16 jam dengan sentuhan aroma vanila madagaskar.',
+        img: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        id: 3,
+        cat: 'makanan',
+        name: 'Truffle Beef Carbonara',
+        price: 'Rp 58.000',
+        desc: 'Pasta al-dente diselimuti saus krim truffle gurih dan potongan daging sapi asap.',
+        img: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        id: 4,
+        cat: 'makanan',
+        name: 'Crispy Sambal Matah Chicken',
+        price: 'Rp 48.000',
+        desc: 'Ayam krispi renyah dengan taburan sambal matah khas Bali segar pedas nikmat.',
+        img: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        id: 5,
+        cat: 'snack',
+        name: 'Butter Croissant Premium',
+        price: 'Rp 26.000',
+        desc: 'Croissant renyah berlapis dengan aroma mentega Prancis yang harum semerbak.',
+        img: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        id: 6,
+        cat: 'snack',
+        name: 'Matcha Basque Cheesecake',
+        price: 'Rp 35.000',
+        desc: 'Kue keju panggang lumer dengan perpaduan rasa matcha Uji Jepang yang autentik.',
+        img: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=400&q=80'
+      }
+    ];
+
+    function renderMenu(items) {
+      const grid = document.getElementById('menuGrid');
+      grid.innerHTML = '';
+      items.forEach(item => {
+        const orderMsg = encodeURIComponent(`Halo ${bizName}, saya ingin memesan menu: *${item.name}* (${item.price}). Apakah tersedia?`);
+        const orderWa = `https://wa.me/${bizPhone}?text=${orderMsg}`;
+
+        const card = document.createElement('div');
+        card.className = 'menu-card';
+        card.innerHTML = `
+          <img src="${item.img}" alt="${item.name}" class="menu-img">
+          <div class="menu-body">
+            <div class="menu-top">
+              <h4 class="menu-name">${item.name}</h4>
+              <span class="menu-price">${item.price}</span>
+            </div>
+            <p class="menu-desc">${item.desc}</p>
+            <a href="${orderWa}" target="_blank" class="btn-add-order">
+              <i data-lucide="plus"></i> Pesan Menu Ini via WA
+            </a>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function filterMenu(category) {
+      document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      if (category === 'all') {
+        renderMenu(MENU_ITEMS);
+      } else {
+        renderMenu(MENU_ITEMS.filter(m => m.cat === category));
+      }
+    }
+
+    renderMenu(MENU_ITEMS);
+    lucide.createIcons();
+  </script>
+</body>
+</html>

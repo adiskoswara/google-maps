@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MapLeads F&B - Deteksi Google Maps & Lead WhatsApp</title>
+  <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="dark-theme">
+  <!-- Background Glow & Mesh -->
+  <div class="mesh-bg">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+  </div>
+
+  <div class="app-layout">
+    <!-- Header -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="logo-box">
+          <i data-lucide="map-pin" class="logo-icon"></i>
+          <span class="pulse-ring"></span>
+        </div>
+        <div>
+          <h1 class="brand-title">MapLeads <span class="gradient-text">F&amp;B Intelligence</span></h1>
+          <p class="brand-subtitle">Deteksi Resto &amp; Kafe Tanpa Website &bull; Ekstraksi Nomor WhatsApp Otomatis</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="btnOpenPitchModal" class="btn btn-outline" title="Kustomisasi Template Pesan WhatsApp">
+          <i data-lucide="message-square-text"></i>
+          <span>Template Pesan WA</span>
+        </button>
+        <button id="btnExportExcel" class="btn btn-emerald" title="Download Spreadsheet Excel">
+          <i data-lucide="file-spreadsheet"></i>
+          <span>Export Excel</span>
+        </button>
+        <button id="btnExportCsv" class="btn btn-outline" title="Download CSV">
+          <i data-lucide="download"></i>
+          <span>CSV</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+      
+      <!-- Top Scanner Bar -->
+      <section class="control-panel glass-card">
+        <div class="panel-header">
+          <div class="panel-tag">
+            <span class="live-dot"></span>
+            <span>GOOGLE MAPS RADAR</span>
+          </div>
+          <span class="panel-hint">Targetkan F&amp;B di kota tujuan untuk mencari calon klien pembuatan website</span>
+        </div>
+
+        <form id="scanForm" class="scan-form">
+          <div class="input-group">
+            <label for="keyword">
+              <i data-lucide="utensils"></i>
+              Kategori / Kata Kunci
+            </label>
+            <div class="select-wrapper">
+              <input type="text" id="keyword" list="keywordList" value="cafe" placeholder="Contoh: cafe, restoran, bakery, coffee shop" required>
+              <datalist id="keywordList">
+                <option value="cafe">
+                <option value="coffee shop">
+                <option value="restoran">
+                <option value="bakery & cake">
+                <option value="kedai kopi">
+                <option value="rumah makan">
+                <option value="bistro & grill">
+                <option value="mie & bakso">
+                <option value="pizza & pasta">
+              </datalist>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="city">
+              <i data-lucide="navigation"></i>
+              Kota / Wilayah
+            </label>
+            <input type="text" id="city" list="cityList" value="Surabaya" placeholder="Contoh: Surabaya, Bandung, Jakarta Selatan" required>
+            <datalist id="cityList">
+              <option value="Jakarta Selatan">
+              <option value="Jakarta Barat">
+              <option value="Jakarta Pusat">
+              <option value="Bandung">
+              <option value="Surabaya">
+              <option value="Semarang">
+              <option value="Yogyakarta">
+              <option value="Malang">
+              <option value="Denpasar Bali">
+              <option value="Medan">
+              <option value="Makassar">
+            </datalist>
+          </div>
+
+          <div class="input-group input-group-sm">
+            <label for="maxResults">
+              <i data-lucide="target"></i>
+              Jumlah Target
+            </label>
+            <select id="maxResults">
+              <option value="10">10 Tempat</option>
+              <option value="20" selected>20 Tempat</option>
+              <option value="40">40 Tempat</option>
+              <option value="60">60 Tempat</option>
+              <option value="100">100 Tempat</option>
+            </select>
+          </div>
+
+          <div class="toggle-group">
+            <label class="toggle-switch">
+              <input type="checkbox" id="filterNoWebOnly">
+              <span class="slider"></span>
+            </label>
+            <span class="toggle-label">Hanya Simpan yang <strong>Belum Ada Website</strong></span>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" id="btnStartScan" class="btn btn-primary btn-glow">
+              <i data-lucide="radar"></i>
+              <span>Mulai Deteksi</span>
+            </button>
+            <button type="button" id="btnStopScan" class="btn btn-danger" style="display: none;">
+              <i data-lucide="square"></i>
+              <span>Hentikan</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Progress Tracker (Hidden when idle) -->
+        <div id="scanTracker" class="scan-tracker" style="display: none;">
+          <div class="tracker-header">
+            <div class="tracker-status">
+              <div class="radar-spinner"></div>
+              <span id="trackerText">Menghubungkan ke Google Maps...</span>
+            </div>
+            <span id="trackerPercent" class="tracker-percent">0%</span>
+          </div>
+          <div class="progress-bar-wrap">
+            <div id="trackerBar" class="progress-bar" style="width: 0%;"></div>
+          </div>
+          <!-- Live Terminal Log -->
+          <div class="terminal-box">
+            <div class="terminal-bar">
+              <span class="terminal-title"><i data-lucide="terminal"></i> Live Stream Ekstraksi Google Maps</span>
+              <span class="terminal-status">Aktif</span>
+            </div>
+            <div id="terminalLogs" class="terminal-body">
+              <div class="log-line text-muted">[Sistem Siap] Masukkan target dan klik Mulai Deteksi</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats Grid -->
+      <section class="stats-grid">
+        <div class="stat-card glass-card">
+          <div class="stat-icon-wrap icon-purple">
+            <i data-lucide="building-2"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Total F&amp;B Terdeteksi</span>
+            <h3 id="statTotal" class="stat-value">0</h3>
+            <span class="stat-sub">Semua profil tersimpan</span>
+          </div>
+        </div>
+
+        <div class="stat-card glass-card border-glow-danger">
+          <div class="stat-icon-wrap icon-rose">
+            <i data-lucide="globe-x"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Belum Mempunyai Website</span>
+            <h3 id="statNoWeb" class="stat-value gradient-danger">0</h3>
+            <span class="stat-sub">Target Utama Klien Potensial</span>
+          </div>
+        </div>
+
+        <div class="stat-card glass-card border-glow-warning">
+          <div class="stat-icon-wrap icon-amber">
+            <i data-lucide="instagram"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Hanya Punya Medsos/Linktree</span>
+            <h3 id="statSocialOnly" class="stat-value">0</h3>
+            <span class="stat-sub">Belum memiliki website resmi</span>
+          </div>
+        </div>
+
+        <div class="stat-card glass-card border-glow-emerald">
+          <div class="stat-icon-wrap icon-emerald">
+            <i data-lucide="phone-call"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">No. WhatsApp Siap Dihubungi</span>
+            <h3 id="statWhatsApp" class="stat-value gradient-emerald">0</h3>
+            <span class="stat-sub">Nomor HP valid Indonesia</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results Section -->
+      <section class="results-section glass-card">
+        <div class="results-header">
+          <div class="results-title-wrap">
+            <h2 class="section-title">Database Profil F&amp;B</h2>
+            <span id="resultsCountBadge" class="badge badge-primary">0 Bisnis</span>
+          </div>
+
+          <!-- Filter & Search Controls -->
+          <div class="filter-controls">
+            <div class="filter-tabs">
+              <button class="filter-tab active" data-filter="all">Semua Profil</button>
+              <button class="filter-tab" data-filter="no_website">
+                <i data-lucide="flame"></i> Belum Punya Website
+              </button>
+              <button class="filter-tab" data-filter="whatsapp">
+                <i data-lucide="phone"></i> Ada WhatsApp
+              </button>
+            </div>
+
+            <div class="search-wrap">
+              <i data-lucide="search" class="search-icon"></i>
+              <input type="text" id="searchInput" placeholder="Cari nama resto, alamat, kategori...">
+            </div>
+
+            <button id="btnCopyAllWa" class="btn btn-outline" title="Salin semua no WhatsApp yang terfilter">
+              <i data-lucide="copy"></i>
+              <span>Copy No WA</span>
+            </button>
+
+            <button id="btnClearAll" class="btn btn-ghost text-danger" title="Kosongkan Database">
+              <i data-lucide="trash-2"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Leads Table -->
+        <div class="table-responsive">
+          <table class="leads-table">
+            <thead>
+              <tr>
+                <th>BISNIS &amp; KATEGORI</th>
+                <th>STATUS WEBSITE</th>
+                <th>NO. WHATSAPP / TELEPON</th>
+                <th>RATING</th>
+                <th>LOKASI &amp; ALAMAT</th>
+                <th class="text-right">AKSI CEPAT</th>
+              </tr>
+            </thead>
+            <tbody id="leadsTableBody">
+              <tr class="empty-row">
+                <td colspan="6">
+                  <div class="empty-state">
+                    <i data-lucide="map-pin-off" class="empty-icon"></i>
+                    <h4>Belum ada data bisnis F&amp;B</h4>
+                    <p>Pilih kategori F&amp;B dan kota di atas, lalu klik <strong>Mulai Deteksi</strong> untuk memindai Google Maps.</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <!-- Pitch Template Modal -->
+    <div id="pitchModal" class="modal-backdrop" style="display: none;">
+      <div class="modal-card glass-card">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <i data-lucide="message-square" class="text-emerald"></i>
+            <div>
+              <h3>Kustomisasi Template Pesan WhatsApp</h3>
+              <span style="font-size: 0.72rem; color: #34d399; display: flex; align-items: center; gap: 4px; margin-top: 2px;">
+                🎓 Teroptimasi: Freelancer Fresh Graduate Informatika Univ. Gunadarma
+              </span>
+            </div>
+          </div>
+          <button id="btnClosePitchModal" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <!-- Profile & Credibility Setting -->
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 12px;">
+            <div style="font-size: 0.76rem; font-weight: 600; color: #38bdf8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i> Identitas &amp; Profil Kredibilitas (Trust Factor)
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <div style="flex: 2; min-width: 220px;">
+                <label class="label-sm" style="display: flex; align-items: center; gap: 4px;">
+                  <i data-lucide="linkedin" style="width: 13px; height: 13px; color: #0a66c2;"></i>
+                  <span>Link Profil LinkedIn Anda:</span>
+                </label>
+                <input type="url" id="userLinkedinInput" placeholder="https://www.linkedin.com/in/username-anda" class="pitch-input" style="width: 100%; background: #080c16; border: 1px solid var(--border-color); color: #fff; padding: 7px 10px; border-radius: var(--radius-sm); font-size: 0.82rem; margin-top: 4px;">
+              </div>
+              <div style="flex: 1; min-width: 140px;">
+                <label class="label-sm" style="display: flex; align-items: center; gap: 4px;">
+                  <i data-lucide="user" style="width: 13px; height: 13px; color: #38bdf8;"></i>
+                  <span>Nama Panggilan:</span>
+                </label>
+                <input type="text" id="userNameInput" placeholder="Nama Anda" class="pitch-input" style="width: 100%; background: #080c16; border: 1px solid var(--border-color); color: #fff; padding: 7px 10px; border-radius: var(--radius-sm); font-size: 0.82rem; margin-top: 4px;">
+              </div>
+            </div>
+          </div>
+
+          <p class="modal-desc" style="margin-bottom: 6px;">
+            Pesan ini otomatis terisi saat klik <strong>Chat WA</strong>. Klik variabel berikut untuk menyisipkannya:
+          </p>
+          <div class="tag-pills" style="margin-bottom: 12px;">
+            <span class="pill" onclick="insertVariable('{nama}')">{nama} = Nama Resto/Kafe</span>
+            <span class="pill" onclick="insertVariable('{kategori}')">{kategori} = Kategori</span>
+            <span class="pill" onclick="insertVariable('{kota}')">{kota} = Kota</span>
+            <span class="pill" onclick="insertVariable('{linkedin}')" style="border-color: rgba(10, 102, 194, 0.4); color: #38bdf8;">🔗 {linkedin} = Link LinkedIn</span>
+            <span class="pill" onclick="insertVariable('{pengirim}')">{pengirim} = Nama Freelancer</span>
+          </div>
+
+          <div class="preset-templates">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label class="label-sm">Pilih Template Cepat:</label>
+              <button type="button" id="btnResetPitchTemplate" style="background: none; border: none; color: #94a3b8; font-size: 0.72rem; cursor: pointer; text-decoration: underline; display: inline-flex; align-items: center; gap: 4px;">
+                <i data-lucide="rotate-ccw" style="width: 11px; height: 11px;"></i> Reset Default Gunadarma
+              </button>
+            </div>
+            <div class="preset-buttons">
+              <button type="button" class="btn-preset active" data-preset="website">Penawaran Website &amp; Menu Online</button>
+              <button type="button" class="btn-preset" data-preset="qr_menu">Penawaran QR Digital Menu</button>
+              <button type="button" class="btn-preset" data-preset="seo">Audit Profil &amp; Branding</button>
+            </div>
+          </div>
+
+          <div class="textarea-wrap">
+            <textarea id="pitchTemplateText" rows="7" class="pitch-textarea"></textarea>
+          </div>
+
+          <div class="gemini-key-box" style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+            <label class="label-sm" style="display: flex; align-items: center; justify-content: space-between;">
+              <span><i data-lucide="sparkles" style="width: 14px; height: 14px; color: #a855f7;"></i> Google Gemini API Key (Opsional)</span>
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #38bdf8; font-size: 0.72rem; text-decoration: underline;">Dapatkan Key Gratis &rarr;</a>
+            </label>
+            <input type="password" id="geminiApiKeyInput" placeholder="Masukkan Gemini API Key (AIStudio)..." class="pitch-input" style="width: 100%; background: #080c16; border: 1px solid var(--border-color); color: #fff; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 0.82rem; margin-top: 4px;">
+            <span style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-top: 4px;">Kosongkan jika ingin menggunakan Smart Heuristic Persona Gunadarma bawaan.</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btnSaveTemplate" class="btn btn-emerald">
+            <i data-lucide="check"></i> Simpan Pengaturan
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Pitch Assistant Modal -->
+    <div id="aiPitchModal" class="modal-backdrop" style="display: none;">
+      <div class="modal-card glass-card" style="max-width: 650px;">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #a855f7, #6366f1); display: flex; align-items: center; justify-content: center;">
+              <i data-lucide="sparkles" style="width: 18px; height: 18px; color: #fff;"></i>
+            </div>
+            <div>
+              <h3 style="font-size: 1.15rem; font-weight: 700;">AI WhatsApp Pitch Studio</h3>
+              <p id="aiTargetBusiness" style="font-size: 0.75rem; color: #38bdf8; margin-top: 2px;">Menulis untuk: ...</p>
+            </div>
+          </div>
+          <button id="btnCloseAiModal" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn-preset active ai-goal-btn" data-goal="website">🌐 Penawaran Website &amp; Menu</button>
+            <button type="button" class="btn-preset ai-goal-btn" data-goal="qr_menu">📲 Penawaran QR E-Menu</button>
+            <button type="button" id="btnRegenerateAi" class="btn btn-outline btn-sm" style="margin-left: auto; font-size: 0.75rem; padding: 4px 10px;">
+              <i data-lucide="refresh-cw" style="width: 13px; height: 13px;"></i> Buat Ulang
+            </button>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.73rem; color: var(--text-dim); background: rgba(255,255,255,0.02); padding: 4px 8px; border-radius: 4px;">
+            <span>🎓 Persona: <strong>Freelance Informatika Univ. Gunadarma</strong></span>
+            <span id="aiActiveLinkedinBadge" style="display: inline-flex; align-items: center; gap: 4px;">
+              <i data-lucide="linkedin" style="width: 12px; height: 12px; color: #0a66c2;"></i>
+              <span id="aiActiveLinkedinText" style="color: #38bdf8; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
+            </span>
+          </div>
+
+          <div style="position: relative;">
+            <textarea id="aiDraftResult" rows="9" class="pitch-textarea" style="font-size: 0.88rem; line-height: 1.5;"></textarea>
+            <div id="aiLoadingOverlay" style="display: none; position: absolute; inset: 0; background: rgba(8, 12, 22, 0.85); backdrop-filter: blur(4px); border-radius: var(--radius-sm); flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+              <div class="radar-spinner" style="width: 24px; height: 24px;"></div>
+              <span style="font-size: 0.8rem; color: #38bdf8;">AI sedang meracik pesan ramah &amp; terpercaya...</span>
+            </div>
+          </div>
+          <span style="font-size: 0.72rem; color: var(--text-dim); margin-top: 6px; display: block;">💡 Anda dapat langsung mengedit teks di atas sebelum dikirim ke WhatsApp.</span>
+        </div>
+        <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+          <a id="btnAiViewDemo" href="#" target="_blank" class="btn btn-outline" style="text-decoration: none;">
+            <i data-lucide="globe"></i> Buka Demo Web
+          </a>
+          <button id="btnCopyAiDraft" class="btn btn-outline">
+            <i data-lucide="copy"></i> Salin Pesan
+          </button>
+          <a id="btnSendAiToWa" href="#" target="_blank" class="btn btn-emerald" style="text-decoration: none;">
+            <i data-lucide="message-circle"></i> Buka &amp; Kirim di WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script src="/static/app.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
