@@ -12,8 +12,9 @@ env/
 ENV/
 
 # Database & local data
-*.db
 *.sqlite3
+# Keep seed leads.db for cloud deployment preview
+!leads.db
 
 # Environment variables & secrets
 .env

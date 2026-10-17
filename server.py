@@ -1,3 +1,4 @@
+import os
 import asyncio
 import io
 import json
@@ -48,14 +49,19 @@ def broadcast_event(event_type: str, data: dict):
         except Exception:
             pass
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+
 @app.get("/", response_class=HTMLResponse)
 async def serve_index():
-    with open("static/index.html", "r", encoding="utf-8") as f:
+    index_file = os.path.join(STATIC_DIR, "index.html")
+    with open(index_file, "r", encoding="utf-8") as f:
         return f.read()
 
 @app.get("/demo", response_class=HTMLResponse)
 async def serve_demo():
-    with open("static/demo.html", "r", encoding="utf-8") as f:
+    demo_file = os.path.join(STATIC_DIR, "demo.html")
+    with open(demo_file, "r", encoding="utf-8") as f:
         return f.read()
 
 @app.get("/api/stream")
@@ -118,6 +124,12 @@ async def start_scan(req: ScanRequest):
     global active_scanner, scan_thread
     if active_scanner is not None:
         return JSONResponse(status_code=400, content={"error": "Scanning sedang berjalan. Harap tunggu atau klik Stop."})
+
+    if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+        broadcast_event("log", {"message": "⚠️ [Info Cloud Vercel] Vercel Serverless Function tidak mendukung background browser Playwright."})
+        broadcast_event("log", {"message": "💡 Untuk scraping data baru dari Google Maps, jalankan di komputer lokal (python run.py) atau VPS."})
+        broadcast_event("status", {"message": "Playwright butuh container aktif (Gunakan Local/VPS)", "progress": 100})
+        return {"status": "cloud_preview", "message": "Playwright scraping requires a full VPS or local environment."}
 
     scan_thread = threading.Thread(
         target=run_scanner_worker,
@@ -259,7 +271,7 @@ async def export_csv(
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 if __name__ == "__main__":
     import uvicorn

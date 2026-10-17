@@ -3,7 +3,23 @@ import os
 import json
 from datetime import datetime
 
-DB_FILE = os.path.join(os.path.dirname(__file__), "leads.db")
+import tempfile
+import shutil
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Vercel / AWS Lambda has a read-only filesystem except temp directory
+if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+    DB_FILE = os.path.join(tempfile.gettempdir(), "leads.db")
+    # Copy seed leads.db to temp directory if it exists in repository
+    source_db = os.path.join(BASE_DIR, "leads.db")
+    if os.path.exists(source_db) and not os.path.exists(DB_FILE):
+        try:
+            shutil.copy2(source_db, DB_FILE)
+        except Exception:
+            pass
+else:
+    DB_FILE = os.path.join(BASE_DIR, "leads.db")
 
 def init_db():
     conn = sqlite3.connect(DB_FILE)
